@@ -1,0 +1,78 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+<!--
+    <record model="ir.ui.view" id="eims_integration.list">
+      <field name="name">eims_integration list</field>
+      <field name="model">eims_integration.eims_integration</field>
+      <field name="arch" type="xml">
+        <list>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </list>
+      </field>
+    </record>
+-->
+
+    <!-- actions opening views on models -->
+<!--
+    <record model="ir.actions.act_window" id="eims_integration.action_window">
+      <field name="name">eims_integration window</field>
+      <field name="res_model">eims_integration.eims_integration</field>
+      <field name="view_mode">list,form</field>
+    </record>
+-->
+
+    <!-- server action to the one above -->
+<!--
+    <record model="ir.actions.server" id="eims_integration.action_server">
+      <field name="name">eims_integration server</field>
+      <field name="model_id" ref="model_eims_integration_eims_integration"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "list,form",
+          "res_model": model._name,
+        }
+      </field>
+    </record>
+-->
+
+    <!-- Top menu item -->
+<!--
+    <menuitem name="eims_integration" id="eims_integration.menu_root"/>
+-->
+    <!-- menu categories -->
+<!--
+    <menuitem name="Menu 1" id="eims_integration.menu_1" parent="eims_integration.menu_root"/>
+    <menuitem name="Menu 2" id="eims_integration.menu_2" parent="eims_integration.menu_root"/>
+-->
+    <!-- actions -->
+<!--
+    <menuitem name="List" id="eims_integration.menu_1_list" parent="eims_integration.menu_1"
+              action="eims_integration.action_window"/>
+    <menuitem name="Server to list" id="eims_integration" parent="eims_integration.menu_2"
+              action="eims_integration.action_server"/>
+-->
+
+    <!-- Inherit the account.move form view to add EIMS fields -->
+    <record id="view_move_form_eims_integration" model="ir.ui.view">
+      <field name="name">account.move.form.eims.integration</field>
+      <field name="model">account.move</field>
+      <field name="inherit_id" ref="account.view_move_form"/>
+      <field name="arch" type="xml">
+        <notebook position="inside">
+          <page string="EIMS Integration">
+            <group>
+              <field name="eims_status" readonly="1"/>
+              <field name="eims_irn" readonly="1"/>
+              <field name="eims_error_message" readonly="1" widget="text"/>
+            </group>
+          </page>
+        </notebook>
+      </field>
+    </record>
+  </data>
+</odoo>
