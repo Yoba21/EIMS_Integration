@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Enhanced Invoice Report with EIMS Integration -->
+        <template id="report_invoice_document_eims_enhanced" inherit_id="account.report_invoice_document">
+            <xpath expr="//div[@class='page']//div[@class='oe_structure']" position="inside">
+                <!-- EIMS Status Header -->
+                <div t-if="o.eims_status and o.eims_status != 'draft'" class="eims_status_header" style="text-align: center; margin-bottom: 15px;">
+                    <div t-if="o.eims_status == 'ok'" 
+                         style="background-color: #28a745; color: white; padding: 8px 16px; border-radius: 5px; display: inline-block; font-weight: bold;">
+                        ✓ EIMS REGISTERED - IRN: <span t-field="o.eims_irn"/>
+                    </div>
+                    <div t-if="o.eims_status == 'failed'" 
+                         style="background-color: #dc3545; color: white; padding: 8px 16px; border-radius: 5px; display: inline-block; font-weight: bold;">
+                        ✗ EIMS REGISTRATION FAILED
+                    </div>
+                    <div t-if="o.eims_status in ['pending', 'sent']" 
+                         style="background-color: #ffc107; color: black; padding: 8px 16px; border-radius: 5px; display: inline-block; font-weight: bold;">
+                        ⏳ EIMS REGISTRATION PENDING
+                    </div>
+                </div>
+            </xpath>
+            
+            <!-- EIMS QR Code Section -->
+            <xpath expr="//div[@class='page']//div[@class='oe_structure']" position="inside">
+                <div t-if="o.eims_qr_image" class="eims_qr_section" style="text-align: center; margin-top: 20px; page-break-inside: avoid;">
+                    <div style="border: 2px solid #007bff; padding: 15px; display: inline-block; background-color: #f8f9fa; border-radius: 8px;">
+                        <div style="margin-bottom: 10px; font-size: 12px; color: #007bff; font-weight: bold;">
+                            EIMS QR CODE
+                        </div>
+                        <img t-att-src="'data:image/png;base64,%s' % o.eims_qr_image" 
+                             style="width: 120px; height: 120px;"/>
+                        <div style="margin-top: 8px; font-size: 10px; color: #666;">
+                            <strong>IRN:</strong> <span t-field="o.eims_irn"/>
+                        </div>
+                        <div style="margin-top: 3px; font-size: 9px; color: #888;">
+                            <strong>Status:</strong> <span t-field="o.eims_status"/>
+                        </div>
+                        <div t-if="o.eims_ack_date" style="margin-top: 3px; font-size: 9px; color: #888;">
+                            <strong>Acknowledged:</strong> <span t-field="o.eims_ack_date"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+            
+            <!-- EIMS Information Footer -->
+            <xpath expr="//div[@class='page']//div[@class='oe_structure']" position="inside">
+                <div t-if="o.eims_irn" class="eims_info_footer" style="margin-top: 30px; padding: 15px; background-color: #e9ecef; border-radius: 5px; border-left: 5px solid #007bff;">
+                    <h4 style="margin: 0 0 10px 0; color: #007bff; font-size: 14px;">EIMS Integration Information</h4>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Invoice Reference Number (IRN):</strong><br/>
+                            <span t-field="o.eims_irn" style="font-family: monospace; font-size: 12px;"/>
+                        </div>
+                        <div class="col-6">
+                            <strong>EIMS Status:</strong><br/>
+                            <span t-field="o.eims_status" style="text-transform: uppercase;"/>
+                        </div>
+                    </div>
+                    <div t-if="o.eims_ack_date" class="row" style="margin-top: 8px;">
+                        <div class="col-6">
+                            <strong>Acknowledgment Date:</strong><br/>
+                            <span t-field="o.eims_ack_date"/>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 10px; color: #666; text-align: center;">
+                        This invoice has been registered with the Ethiopian EIMS system.
+                    </div>
+                </div>
+            </xpath>
+        </template>
+
+        <!-- Alternative Compact QR Code Version -->
+        <template id="report_invoice_document_eims_compact" inherit_id="account.report_invoice_document">
+            <xpath expr="//div[@class='oe_structure']//table[@class='table table-sm o_main_table']" position="after">
+                <div t-if="o.eims_qr_image" class="eims_qr_compact" style="text-align: center; margin-top: 10px; page-break-inside: avoid;">
+                    <div style="border: 1px solid #ddd; padding: 5px; display: inline-block; background-color: #f9f9f9;">
+                        <img t-att-src="'data:image/png;base64,%s' % o.eims_qr_image" 
+                             style="width: 60px; height: 60px;"/>
+                        <div style="margin-top: 2px; font-size: 8px; color: #666;">
+                            <strong>EIMS</strong>
+                        </div>
+                        <div style="margin-top: 1px; font-size: 7px; color: #888;">
+                            <span t-field="o.eims_irn"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </template>
+
+        <!-- EIMS Error Information Template -->
+        <template id="report_invoice_document_eims_error" inherit_id="account.report_invoice_document">
+            <xpath expr="//div[@class='page']//div[@class='oe_structure']" position="inside">
+                <div t-if="o.eims_status == 'failed' and o.eims_last_error" class="eims_error_info" style="margin-top: 20px; padding: 10px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
+                    <h5 style="margin: 0 0 8px 0; color: #721c24; font-size: 12px;">EIMS Registration Error</h5>
+                    <div style="font-size: 10px; color: #721c24;">
+                        <strong>Error:</strong> <span t-field="o.eims_last_error"/>
+                    </div>
+                    <div style="margin-top: 5px; font-size: 9px; color: #721c24;">
+                        This invoice could not be registered with EIMS. Please contact your system administrator.
+                    </div>
+                </div>
+            </xpath>
+        </template>
+
+    </data>
+</odoo>
+

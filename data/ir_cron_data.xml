@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- EIMS Log Cleanup Cron Job -->
+        <record id="ir_cron_eims_log_cleanup" model="ir.cron">
+            <field name="name">EIMS Log Cleanup</field>
+            <field name="model_id" ref="model_eims_log"/>
+            <field name="state">code</field>
+            <field name="code">model.cleanup_old_logs()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <!-- EIMS Certificate Expiry Check Cron Job -->
+        <record id="ir_cron_eims_certificate_check" model="ir.cron">
+            <field name="name">EIMS Certificate Expiry Check</field>
+            <field name="model_id" ref="model_eims_certificate"/>
+            <field name="state">code</field>
+            <field name="code">model.check_certificate_expiry()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <!-- EIMS Retry Failed Invoices Cron Job -->
+        <record id="ir_cron_eims_retry_failed" model="ir.cron">
+            <field name="name">EIMS Retry Failed Invoices</field>
+            <field name="model_id" ref="model_account_move"/>
+            <field name="state">code</field>
+            <field name="code">model.retry_failed_eims_invoices()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active">False</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+        <!-- EIMS Health Check Cron Job -->
+        <record id="ir_cron_eims_health_check" model="ir.cron">
+            <field name="name">EIMS Health Check</field>
+            <field name="model_id" ref="model_eims_log"/>
+            <field name="state">code</field>
+            <field name="code">model.perform_health_check()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+
+    </data>
+</odoo>
+

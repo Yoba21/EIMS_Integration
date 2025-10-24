@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Main EIMS Menu -->
+        <menuitem id="menu_eims_root" 
+                  name="EIMS" 
+                  sequence="100"
+                  web_icon="eims_integration,static/description/icon.png"/>
+
+        <!-- Configuration Menu -->
+        <menuitem id="menu_eims_config" 
+                  name="Configuration" 
+                  parent="menu_eims_root" 
+                  sequence="10"/>
+
+        <!-- Certificate Management -->
+        <menuitem id="menu_eims_certificates" 
+                  name="Certificates" 
+                  parent="menu_eims_config" 
+                  action="action_eims_certificate" 
+                  sequence="10"/>
+
+        <!-- Master Data Management -->
+        <menuitem id="menu_eims_master_data" 
+                  name="Master Data" 
+                  parent="menu_eims_config" 
+                  action="action_eims_master" 
+                  sequence="20"/>
+
+        <!-- Master Data Submenus -->
+        <menuitem id="menu_eims_master_regions" 
+                  name="Regions" 
+                  parent="menu_eims_master_data" 
+                  action="action_eims_master_regions" 
+                  sequence="10"/>
+
+        <menuitem id="menu_eims_master_transaction_types" 
+                  name="Transaction Types" 
+                  parent="menu_eims_master_data" 
+                  action="action_eims_master_transaction_types" 
+                  sequence="20"/>
+
+        <menuitem id="menu_eims_master_tax_codes" 
+                  name="Tax Codes" 
+                  parent="menu_eims_master_data" 
+                  action="action_eims_master_tax_codes" 
+                  sequence="30"/>
+
+        <!-- API Settings -->
+        <menuitem id="menu_eims_settings" 
+                  name="API Settings" 
+                  parent="menu_eims_config" 
+                  action="action_eims_settings" 
+                  sequence="30"/>
+
+        <!-- Operations Menu -->
+        <menuitem id="menu_eims_operations" 
+                  name="Operations" 
+                  parent="menu_eims_root" 
+                  sequence="20"/>
+
+        <!-- Invoice Management -->
+        <menuitem id="menu_eims_pending_invoices" 
+                  name="Invoices Pending IRN" 
+                  parent="menu_eims_operations" 
+                  action="action_eims_pending_invoices" 
+                  sequence="10"/>
+
+        <!-- Log Management -->
+        <menuitem id="menu_eims_logs" 
+                  name="Logs" 
+                  parent="menu_eims_operations" 
+                  action="action_eims_log" 
+                  sequence="20"/>
+
+        <!-- Reports Menu -->
+        <menuitem id="menu_eims_reports" 
+                  name="Reports" 
+                  parent="menu_eims_root" 
+                  sequence="30"/>
+
+        <!-- EIMS Integration Report -->
+        <menuitem id="menu_eims_integration_report" 
+                  name="EIMS Integration Report" 
+                  parent="menu_eims_reports" 
+                  action="action_eims_integration_report" 
+                  sequence="10"/>
+
+        <!-- Help Menu -->
+        <menuitem id="menu_eims_help" 
+                  name="Help" 
+                  parent="menu_eims_root" 
+                  sequence="40"/>
+
+                <!-- Add wizard to menu -->
+        <menuitem id="menu_eims_configuration_wizard" 
+                  name="Setup Wizard" 
+                  parent="menu_eims_config" 
+                  action="action_eims_configuration_wizard" 
+                  sequence="5"/>
+
+        <!-- Documentation
+        <menuitem id="menu_eims_documentation" 
+                  name="Documentation" 
+                  parent="menu_eims_help" 
+                  action="action_eims_documentation" 
+                  sequence="10"/> -->
+        <!--   Troubleshooting 
+        <menuitem id="menu_eims_troubleshooting" 
+                  name="Troubleshooting" 
+                  parent="menu_eims_help" 
+                  action="action_eims_troubleshooting" 
+                  sequence="20"/> -->
+
+    </data>
+</odoo>
+

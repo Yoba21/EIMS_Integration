@@ -3,65 +3,43 @@ import base64
 import requests
 import logging
 from .signer import canonicalize_json, sign_request_sha512, encode_certificate
-from .config import EIMS_API_KEY, EIMS_TIN
-from urllib.parse import urlencode
 
 _logger = logging.getLogger(__name__)
 
-def eims_login(client_id, client_secret, apikey, tin, private_key_path, certificate_path, login_url, timeout=30):
+def eims_login(client_id, client_secret, apikey, tin, private_key_path, certificate_path, login_url, timeout=30, verify_ssl=True):
     """
-    Authenticate with EIMS system and return access token
+    Authenticate with EIMS system and return access token.
     
-    Args:
-        client_id: EIMS client ID
-        client_secret: EIMS client secret
-        apikey: EIMS API key
-        tin: EIMS TIN
-        private_key_path: Path to private key file
-        certificate_path: Path to certificate file
-        login_url: EIMS login URL
-        timeout: Request timeout in seconds (default: 30)
-    
-    Returns:
-        str: Access token from EIMS
+    Signs the request with the private key and includes the certificate.
     """
     try:
         _logger.info("Preparing EIMS login request...")
-        
-        # Build query parameters (note: 'sellerTin' in query, 'tin' in body)
-        params = {
-            "clientId": client_id,
-            "clientSecret": client_secret,
-            "apikey": apikey,
-            "sellerTin": tin
-        }
-        url_with_params = f"{login_url}?{urlencode(params)}"
 
-        # Prepare JSON body (camelCase, 'tin' in body)
+        # Load private key
+        _logger.debug("Loading private key from: %s", private_key_path)
+        with open(private_key_path, "rb") as pk_file:
+            private_key = pk_file.read()
+        
+        # Load certificate
+        _logger.debug("Loading certificate from: %s", certificate_path)
+        with open(certificate_path, "rb") as cert_file:
+            certificate = cert_file.read()
+        
+        # Prepare request object
         request_obj = {
             "clientId": client_id,
             "clientSecret": client_secret,
             "apikey": apikey,
             "tin": tin
         }
-        _logger.info("Login payload: %s", json.dumps(request_obj))
+        _logger.info("Login request object prepared")
 
-        _logger.debug("Loading private key from: %s", private_key_path)
-        # Load keys
-        with open(private_key_path, "rb") as pk_file:
-            private_key = pk_file.read()
-            
-        _logger.debug("Loading certificate from: %s", certificate_path)
-        with open(certificate_path, "rb") as cert_file:
-            certificate = cert_file.read()
-
-        # Canonicalize & Sign
-        _logger.debug("Canonicalizing and signing request...")
+        # Canonicalize and sign
         canonical = canonicalize_json(request_obj)
         signature = sign_request_sha512(canonical, private_key)
         cert_encoded = encode_certificate(certificate)
-
-        # Prepare full request payload
+        
+        # Full payload
         full_payload = {
             "request": request_obj,
             "signature": signature,
@@ -73,13 +51,13 @@ def eims_login(client_id, client_secret, apikey, tin, private_key_path, certific
             "Accept": "application/json"
         }
 
-        _logger.info("Sending EIMS login request to: %s", url_with_params)
+        _logger.info("Sending EIMS login request to: %s", login_url)
         response = requests.post(
-            url_with_params,
+            login_url,
             headers=headers,
-            json=request_obj,
+            json=full_payload,  # send the signed payload
             timeout=timeout,
-            verify=False  # HTTP, so SSL verify off
+            verify=verify_ssl
         )
 
         _logger.info("EIMS login response status: %s", response.status_code)
@@ -87,8 +65,6 @@ def eims_login(client_id, client_secret, apikey, tin, private_key_path, certific
 
         if response.status_code == 200:
             response_data = response.json()
-            
-            # Extract access token from data.accessToken
             if 'data' in response_data and 'accessToken' in response_data['data']:
                 access_token = response_data['data']['accessToken']
                 _logger.info("EIMS login successful, access token retrieved")
@@ -99,7 +75,7 @@ def eims_login(client_id, client_secret, apikey, tin, private_key_path, certific
         else:
             _logger.error("EIMS login failed with status %s: %s", response.status_code, response.text)
             raise Exception(f"EIMS login failed: {response.status_code} {response.text}")
-            
+
     except requests.exceptions.Timeout:
         _logger.error("EIMS login request timed out after %s seconds", timeout)
         raise Exception(f"EIMS login request timed out after {timeout} seconds")

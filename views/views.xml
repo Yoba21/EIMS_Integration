@@ -1,78 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-  <data>
-    <!-- explicit list view definition -->
-<!--
-    <record model="ir.ui.view" id="eims_integration.list">
-      <field name="name">eims_integration list</field>
-      <field name="model">eims_integration.eims_integration</field>
-      <field name="arch" type="xml">
-        <list>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </list>
-      </field>
-    </record>
--->
 
-    <!-- actions opening views on models -->
-<!--
-    <record model="ir.actions.act_window" id="eims_integration.action_window">
-      <field name="name">eims_integration window</field>
-      <field name="res_model">eims_integration.eims_integration</field>
-      <field name="view_mode">list,form</field>
+    <!-- ============ ACTIONS ============ -->
+    <!-- EIMS Settings Action -->
+    <record id="action_eims_settings" model="ir.actions.act_window">
+        <field name="name">EIMS API Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">list,form</field>
+        <field name="target">current</field>
     </record>
--->
 
-    <!-- server action to the one above -->
-<!--
-    <record model="ir.actions.server" id="eims_integration.action_server">
-      <field name="name">eims_integration server</field>
-      <field name="model_id" ref="model_eims_integration_eims_integration"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "list,form",
-          "res_model": model._name,
-        }
-      </field>
+    <!-- EIMS Pending Invoices Action -->
+    <record id="action_eims_pending_invoices" model="ir.actions.act_window">
+        <field name="name">Invoices Pending IRN</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type','=','out_invoice'),('eims_irn','=',False),('state','=','posted')]</field>
+        <field name="context">{'search_default_eims_pending':1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">All invoices have EIMS IRN!</p>
+            <p>Invoices that are posted but don't have an EIMS IRN will appear here. You can retry failed integrations or investigate issues.</p>
+        </field>
     </record>
--->
 
-    <!-- Top menu item -->
-<!--
-    <menuitem name="eims_integration" id="eims_integration.menu_root"/>
--->
-    <!-- menu categories -->
-<!--
-    <menuitem name="Menu 1" id="eims_integration.menu_1" parent="eims_integration.menu_root"/>
-    <menuitem name="Menu 2" id="eims_integration.menu_2" parent="eims_integration.menu_root"/>
--->
-    <!-- actions -->
-<!--
-    <menuitem name="List" id="eims_integration.menu_1_list" parent="eims_integration.menu_1"
-              action="eims_integration.action_window"/>
-    <menuitem name="Server to list" id="eims_integration" parent="eims_integration.menu_2"
-              action="eims_integration.action_server"/>
--->
+    <!-- ============ VIEWS ============ -->
 
-    <!-- Inherit the account.move form view to add EIMS fields -->
-    <record id="view_move_form_eims_integration" model="ir.ui.view">
-      <field name="name">account.move.form.eims.integration</field>
-      <field name="model">account.move</field>
-      <field name="inherit_id" ref="account.view_move_form"/>
-      <field name="arch" type="xml">
-        <notebook position="inside">
-          <page string="EIMS Integration">
-            <group>
-              <field name="eims_status" readonly="1"/>
-              <field name="eims_irn" readonly="1"/>
-              <field name="eims_error_message" readonly="1" widget="text"/>
-            </group>
-          </page>
-        </notebook>
-      </field>
+    <!-- 1️⃣ List View Extension -->
+    <record id="view_move_list_eims_enhanced" model="ir.ui.view">
+        <field name="name">account.move.list.eims.enhanced</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+            <!-- Insert EIMS status after total amount -->
+            <xpath expr="//field[@name='amount_total_signed']" position="after">
+                <field name="eims_status" widget="badge" optional="show"
+                       options="{'decoration-success':'ok',
+                                 'decoration-danger':'failed',
+                                 'decoration-info':'sent',
+                                 'decoration-muted':'draft'}"/>
+            </xpath>
+        </field>
     </record>
-  </data>
+
+    <!-- 2️⃣ Form View Extension -->
+    <record id="view_move_form_eims_enhanced" model="ir.ui.view">
+        <field name="name">account.move.form.eims.enhanced</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <!-- Add EIMS fields under existing “Other Info” tab -->
+            <xpath expr="//page[@name='other_info']" position="inside">
+                <group string="EIMS Integration">
+                    <field name="eims_irn"/>
+                    <field name="eims_status" widget="badge"
+                           options="{'decoration-success':'ok',
+                                     'decoration-danger':'failed',
+                                     'decoration-info':'sent',
+                                     'decoration-muted':'draft'}"/>
+                    <field name="eims_error_message" readonly="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 3️⃣ Search View Extension -->
+    <record id="view_move_search_eims_enhanced" model="ir.ui.view">
+        <field name="name">account.move.search.eims.enhanced</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <!-- Add new EIMS filters safely -->
+            <xpath expr="//filter[last()]" position="after">
+                <separator/>
+                <filter string="EIMS Success" name="eims_success" domain="[('eims_status','=','ok')]"/>
+                <filter string="EIMS Failed" name="eims_failed" domain="[('eims_status','=','failed')]"/>
+                <filter string="EIMS Pending" name="eims_pending" domain="[('eims_status','in',['pending','sent'])]"/>
+                <filter string="No EIMS IRN" name="no_eims_irn" domain="[('eims_irn','=',False)]"/>
+            </xpath>
+
+            <!-- Add group-by safely -->
+            <xpath expr="/search" position="inside">
+                <group expand="0" string="Group By">
+                    <filter string="EIMS Status" name="group_eims_status"
+                            context="{'group_by':'eims_status'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>

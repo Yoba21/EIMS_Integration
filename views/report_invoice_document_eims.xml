@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Extend the standard invoice report to include EIMS details -->
+        <template id="report_invoice_document_eims" inherit_id="account.report_invoice_document">
+
+            <!-- 1️⃣ Add EIMS Status Badge near invoice header -->
+            <xpath expr="//div[@class='clearfix invoice_main']/div[@class='page mb-4']/t[@t-set='layout_document_title']" position="after">
+                <div t-if="o.eims_status"
+                     class="text-end mb-2"
+                     style="margin-top:5px;">
+                    <span t-if="o.eims_status == 'ok'"
+                          style="background-color:#28a745;color:white;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:bold;">
+                        ✓ EIMS REGISTERED
+                    </span>
+                    <span t-if="o.eims_status == 'failed'"
+                          style="background-color:#dc3545;color:white;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:bold;">
+                        ✗ EIMS FAILED
+                    </span>
+                    <span t-if="o.eims_status in ['pending','sent']"
+                          style="background-color:#ffc107;color:black;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:bold;">
+                        ⏳ EIMS PENDING
+                    </span>
+                </div>
+            </xpath>
+
+            <!-- 2️⃣ Add EIMS QR Code below totals summary -->
+            <xpath expr="//div[@id='right-elements']" position="after">
+                <div t-if="o.eims_qr_image"
+                     class="eims_qr_section text-center mt-3"
+                     style="page-break-inside:avoid;">
+                    <div style="border:1px solid #ddd;padding:10px;display:inline-block;background-color:#f9f9f9;">
+                        <img t-att-src="'data:image/png;base64,%s' % o.eims_qr_image"
+                             style="width:100px;height:100px;"/>
+                        <div style="margin-top:5px;font-size:10px;color:#666;">
+                            <strong>EIMS QR Code</strong>
+                        </div>
+                        <div t-if="o.eims_irn" style="margin-top:2px;font-size:9px;color:#888;">
+                            <strong>IRN:</strong> <span t-field="o.eims_irn"/>
+                        </div>
+                        <div t-if="o.eims_status" style="margin-top:2px;font-size:9px;color:#888;">
+                            <strong>Status:</strong> <span t-field="o.eims_status"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+
+            <!-- 3️⃣ Add EIMS Info Section near footer (before terms/comments) -->
+            <xpath expr="//div[@id='payment_term']" position="before">
+                <div t-if="o.eims_irn"
+                     class="eims_info_section mt-3 p-2"
+                     style="background-color:#f8f9fa;border-left:4px solid #007bff;">
+                    <h4 style="margin:0 0 8px 0;color:#007bff;font-size:13px;">EIMS Information</h4>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>IRN:</strong> <span t-field="o.eims_irn"/>
+                        </div>
+                        <div class="col-6">
+                            <strong>Status:</strong> <span t-field="o.eims_status"/>
+                        </div>
+                    </div>
+                    <div t-if="o.eims_ack_date" class="row mt-1">
+                        <div class="col-6">
+                            <strong>Acknowledgment Date:</strong> <span t-field="o.eims_ack_date"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+
+        </template>
+    </data>
+</odoo>

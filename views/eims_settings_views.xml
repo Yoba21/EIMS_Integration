@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- EIMS Settings Tab -->
+        <record id="view_eims_settings_form" model="ir.ui.view">
+            <field name="name">eims.settings.form</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+
+                <!-- Create a new EIMS tab similar to Sales -->
+                <xpath expr="//form" position="inside">
+                    <app string="EIMS Integration" data-string="EIMS Integration"
+                         name="eims_integration" icon="fa-qrcode"
+                         groups="base.group_system">
+
+                        <block title="API Authentication" name="eims_auth_block">
+                            <setting id="eims_client_id" help="EIMS Client ID for authentication">
+                                <field name="eims_client_id"/>
+                            </setting>
+
+                            <setting id="eims_client_secret" help="EIMS Client Secret for authentication">
+                                <field name="eims_client_secret"/>
+                            </setting>
+
+                            <setting id="eims_api_key" help="API Key used to communicate with EIMS">
+                                <field name="eims_api_key"/>
+                            </setting>
+
+                            <setting id="eims_tin" help="Company’s Tax Identification Number (TIN)">
+                                <field name="eims_tin"/>
+                            </setting>
+                        </block>
+
+                        <block title="API Endpoints" name="eims_api_block">
+                            <setting id="eims_login_url" help="EIMS Login API Endpoint">
+                                <field name="eims_login_url"/>
+                            </setting>
+
+                            <setting id="eims_invoice_submit_url" help="EIMS Invoice Submission API Endpoint">
+                                <field name="eims_invoice_submit_url"/>
+                            </setting>
+                        </block>
+
+                        <block title="Certificates And Keys" name="eims_keys_block">
+                            <setting id="eims_private_key_path" help="Path to the private key file (.key)">
+                                <field name="eims_private_key_path"/>
+                            </setting>
+
+                            <setting id="eims_certificate_path" help="Path to the certificate file (.pem)">
+                                <field name="eims_certificate_path"/>
+                            </setting>
+                        </block>
+
+                        <block title="System Behavior" name="eims_behavior_block">
+                            <setting id="eims_timeout" help="Timeout for EIMS API requests in seconds">
+                                <field name="eims_timeout"/>
+                            </setting>
+
+                            <setting id="eims_verify_ssl" help="Enable or disable SSL certificate verification">
+                                <field name="eims_verify_ssl"/>
+                            </setting>
+
+                            <setting id="eims_auto_register" help="Automatically register invoices to EIMS when posted">
+                                <field name="eims_auto_register"/>
+                            </setting>
+
+                            <setting id="eims_block_on_error" help="Block invoice posting if EIMS registration fails">
+                                <field name="eims_block_on_error"/>
+                            </setting>
+                        </block>
+
+                        <!-- Test Connection Button at the bottom of the tab -->
+                        <block>
+                            <button name="action_test_eims_connection"
+                                    type="object"
+                                    class="btn btn-primary"
+                                    string="Test Connection"
+                                    icon="fa-plug"/>
+                        </block>
+
+                    </app>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

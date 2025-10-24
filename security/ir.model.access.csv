@@ -1,2 +1,13 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_eims_integration_eims_integration,eims_integration.eims_integration,model_eims_integration_eims_integration,base.group_user,1,1,1,1
+access_eims_certificate_user,eims.certificate,model_eims_certificate,group_eims_user,1,0,0,0
+access_eims_certificate_officer,eims.certificate,model_eims_certificate,group_eims_officer,1,1,1,1
+access_eims_certificate_manager,eims.certificate,model_eims_certificate,group_eims_manager,1,1,1,1
+access_eims_log_user,eims.log,model_eims_log,group_eims_user,1,0,0,0
+access_eims_log_officer,eims.log,model_eims_log,group_eims_officer,1,1,1,1
+access_eims_log_manager,eims.log,model_eims_log,group_eims_manager,1,1,1,1
+access_eims_master_user,eims.master,model_eims_master,group_eims_user,1,0,0,0
+access_eims_master_officer,eims.master,model_eims_master,group_eims_officer,1,1,1,1
+access_eims_master_manager,eims.master,model_eims_master,group_eims_manager,1,1,1,1
+access_account_move_eims_user,account.move.eims,model_account_move,group_eims_user,1,0,0,0
+access_account_move_eims_officer,account.move.eims,model_account_move,group_eims_officer,1,1,0,0
+access_account_move_eims_manager,account.move.eims,model_account_move,group_eims_manager,1,1,0,0

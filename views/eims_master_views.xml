@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- EIMS Master Data Views -->
+        <record id="view_eims_master_list" model="ir.ui.view">
+            <field name="name">eims.master.list</field>
+            <field name="model">eims.master</field>
+            <field name="arch" type="xml">
+                <list string="EIMS Master Data" decoration-muted="not is_active">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="is_active"/>
+                    <field name="description" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_eims_master_form" model="ir.ui.view">
+            <field name="name">eims.master.form</field>
+            <field name="model">eims.master</field>
+            <field name="arch" type="xml">
+                <form string="EIMS Master Data">
+                    <header>
+                        <button name="action_deactivate" type="object" string="Deactivate" 
+                                class="btn-secondary"
+                                invisible="not is_active"/>
+                        <button name="action_activate" type="object" string="Activate" 
+                                class="btn-primary"
+                                invisible="is_active"/>
+                        <field name="is_active" widget="statusbar" statusbar_visible="active"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="code"/>
+                                <field name="name"/>
+                                <field name="type"/>
+                                <field name="parent_id" invisible="type not in ['region','wereda']"/>
+                            </group>
+                            <group>
+                                <field name="region_code" invisible="type != 'region'"/>
+                                <field name="wereda_code" invisible="type != 'wereda'"/>
+                                <field name="tax_rate" invisible="type != 'tax_code'"/>
+                                <field name="uom_category" invisible="type != 'uom'"/>
+                            </group>
+                        </group>
+                        <group string="Description">
+                            <field name="description" nolabel="1"/>
+                        </group>
+                        <group string="Children" invisible="not child_ids">
+                            <field name="child_ids" readonly="1">
+                                <list editable="bottom">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="is_active"/>
+                                </list>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_eims_master_search" model="ir.ui.view">
+            <field name="name">eims.master.search</field>
+            <field name="model">eims.master</field>
+            <field name="arch" type="xml">
+                <search string="EIMS Master Data">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="type"/>
+                    <separator/>
+                    <filter string="Active" name="active" domain="[('is_active', '=', True)]"/>
+                    <filter string="Inactive" name="inactive" domain="[('is_active', '=', False)]"/>
+                    <separator/>
+                    <filter string="Regions" name="regions" domain="[('type', '=', 'region')]"/>
+                    <filter string="Transaction Types" name="transaction_types" domain="[('type', '=', 'transaction_type')]"/>
+                    <filter string="Document Types" name="document_types" domain="[('type', '=', 'document_type')]"/>
+                    <filter string="Payment Modes" name="payment_modes" domain="[('type', '=', 'payment_mode')]"/>
+                    <filter string="Tax Codes" name="tax_codes" domain="[('type', '=', 'tax_code')]"/>
+                    <filter string="Units of Measure" name="uom" domain="[('type', '=', 'uom')]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Type" name="type" domain="[]" context="{'group_by': 'type'}"/>
+                        <filter string="Parent" name="parent" domain="[]" context="{'group_by': 'parent_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- EIMS Master Data Actions -->
+        <record id="action_eims_master" model="ir.actions.act_window">
+            <field name="name">EIMS Master Data</field>
+            <field name="res_model">eims.master</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_eims_master_search"/>
+            <field name="context">{'search_default_active': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    EIMS Master Data Management
+                </p>
+                <p>
+                    Manage EIMS master data including regions, transaction types, tax codes, and units of measure.
+                    This data is used when generating EIMS-compliant invoice payloads.
+                </p>
+            </field>
+        </record>
+
+        <!-- Specific Actions for Different Types -->
+        <record id="action_eims_master_regions" model="ir.actions.act_window">
+            <field name="name">EIMS Regions</field>
+            <field name="res_model">eims.master</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('type', '=', 'region')]</field>
+            <field name="context">{'search_default_active': 1, 'default_type': 'region'}</field>
+        </record>
+
+        <record id="action_eims_master_transaction_types" model="ir.actions.act_window">
+            <field name="name">EIMS Transaction Types</field>
+            <field name="res_model">eims.master</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('type', '=', 'transaction_type')]</field>
+            <field name="context">{'search_default_active': 1, 'default_type': 'transaction_type'}</field>
+        </record>
+
+        <record id="action_eims_master_tax_codes" model="ir.actions.act_window">
+            <field name="name">EIMS Tax Codes</field>
+            <field name="res_model">eims.master</field>
+            <field name="view_mode">list,form</field>
+            <field name="domain">[('type', '=', 'tax_code')]</field>
+            <field name="context">{'search_default_active': 1, 'default_type': 'tax_code'}</field>
+        </record>
+
+    </data>
+</odoo>

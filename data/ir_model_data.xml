@@ -1,6 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <!-- This file ensures the EIMS fields are properly created in the database -->
+        <!-- Load Default EIMS Master Data -->
+        <function model="eims.master" name="load_default_data"/>
+        
+        <!-- EIMS Configuration Parameters -->
+        <record id="eims_config_client_id" model="ir.config_parameter">
+            <field name="key">eims_integration.client_id</field>
+            <field name="value">602016be-089c-4914-a70b-c389993810e3</field>
+        </record>
+        
+        <record id="eims_config_client_secret" model="ir.config_parameter">
+            <field name="key">eims_integration.client_secret</field>
+            <field name="value">038b0ec3-3a4f-4d22-9ba6-f9489882ea67</field>
+        </record>
+        
+        <record id="eims_config_api_key" model="ir.config_parameter">
+            <field name="key">eims_integration.api_key</field>
+            <field name="value">7ed5f7a2-4290-4db0-93f1-fa5376869f51</field>
+        </record>
+        
+        <record id="eims_config_tin" model="ir.config_parameter">
+            <field name="key">eims_integration.tin</field>
+            <field name="value">0062192232</field>
+        </record>
+        
+        <record id="eims_config_login_url" model="ir.config_parameter">
+            <field name="key">eims_integration.login_url</field>
+            <field name="value">https://core.mor.gov.et/auth/login</field>
+        </record>
+        
+        <record id="eims_config_invoice_submit_url" model="ir.config_parameter">
+            <field name="key">eims_integration.invoice_submit_url</field>
+            <field name="value">https://core.mor.gov.et/v1/register</field>
+        </record>
+        
+        <record id="eims_config_private_key_path" model="ir.config_parameter">
+            <field name="key">eims_integration.private_key_path</field>
+            <field name="value">C:/Users/Lenovo/Desktop/POS Integration/private_key.key</field>
+        </record>
+        
+        <record id="eims_config_certificate_path" model="ir.config_parameter">
+            <field name="key">eims_integration.certificate_path</field>
+            <field name="value">C:/Users/Lenovo/Desktop/POS Integration/0062192232.pem</field>
+        </record>
+        
+        <record id="eims_config_timeout" model="ir.config_parameter">
+            <field name="key">eims_integration.timeout</field>
+            <field name="value">30</field>
+        </record>
+        
+        <record id="eims_config_verify_ssl" model="ir.config_parameter">
+            <field name="key">eims_integration.verify_ssl</field>
+            <field name="value">True</field>
+        </record>
+        
+        <record id="eims_config_auto_register" model="ir.config_parameter">
+            <field name="key">eims_integration.auto_register</field>
+            <field name="value">True</field>
+        </record>
+        
+        <record id="eims_config_block_on_error" model="ir.config_parameter">
+            <field name="key">eims_integration.block_on_error</field>
+            <field name="value">False</field>
+        </record>
+        
+        <record id="eims_config_default_region" model="ir.config_parameter">
+            <field name="key">eims_integration.default_region</field>
+            <field name="value">11</field>
+        </record>
+        
+        <record id="eims_config_default_wereda" model="ir.config_parameter">
+            <field name="key">eims_integration.default_wereda</field>
+            <field name="value">01</field>
+        </record>
+        
+        <record id="eims_config_default_system_type" model="ir.config_parameter">
+            <field name="key">eims_integration.default_system_type</field>
+            <field name="value">POS</field>
+        </record>
+        
+        <record id="eims_config_default_system_number" model="ir.config_parameter">
+            <field name="key">eims_integration.default_system_number</field>
+            <field name="value">ODOO18</field>
+        </record>
+        
+        <!-- EIMS Report Actions -->
+        <record id="action_eims_integration_report" model="ir.actions.act_window">
+            <field name="name">EIMS Integration Report</field>
+            <field name="res_model">eims.log</field>
+            <field name="view_mode">graph,pivot,list,form</field>
+            <field name="context">{'search_default_today': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    EIMS Integration Analytics
+                </p>
+                <p>
+                    Analyze EIMS integration performance, success rates, and identify issues.
+                    Use the graph and pivot views to get insights into your EIMS integration.
+                </p>
+            </field>
+        </record>
+        
     </data>
-</odoo> 
+</odoo>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- EIMS Log Views -->
+        <record id="view_eims_log_list" model="ir.ui.view">
+            <field name="name">eims.log.list</field>
+            <field name="model">eims.log</field>
+            <field name="arch" type="xml">
+                <list string="EIMS Logs" decoration-success="is_success" decoration-danger="has_error">
+                    <field name="invoice_number"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="state" widget="badge" 
+                           options="{'decoration-success': 'ok', 'decoration-danger': 'failed', 'decoration-info': 'sent', 'decoration-muted': 'draft'}"/>
+                    <field name="irn"/>
+                    <field name="http_status_code"/>
+                    <field name="response_time_ms"/>
+                    <field name="datetime"/>
+                    <field name="error_text" optional="hide"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="view_eims_log_form" model="ir.ui.view">
+            <field name="name">eims.log.form</field>
+            <field name="model">eims.log</field>
+            <field name="arch" type="xml">
+                <form string="EIMS Log">
+                    <header>
+                        <button name="action_retry_invoice" type="object" string="Retry Invoice" 
+                                class="btn-primary"
+                                invisible="state != 'failed'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent,ok,failed"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_request_json" type="object" 
+                                    class="oe_stat_button" icon="fa-upload">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Request</span>
+                                </div>
+                            </button>
+                            <button name="action_view_response_json" type="object" 
+                                    class="oe_stat_button" icon="fa-download">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Response</span>
+                                </div>
+                            </button>
+                            <button name="action_retry_invoice" type="object" 
+                                    class="oe_stat_button" icon="fa-refresh"
+                                    invisible="state != 'failed'" >
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">Retry</span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="display_name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="move_id"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="datetime"/>
+                                <field name="ack_date"/>
+                            </group>
+                            <group>
+                                <field name="state"/>
+                                <field name="irn"/>
+                                <field name="http_status_code"/>
+                                <field name="response_time_ms"/>
+                                <field name="error_code"/>
+                            </group>
+                        </group>
+                        <group string="Error Information" invisible="not has_error">
+                            <field name="error_text" readonly="1" widget="text"/>
+                        </group>
+                        <group string="QR Code" invisible="not qr_code">
+                            <field name="qr_code" widget="image" readonly="1"/>
+                        </group>
+                        <notebook>
+                            <page string="Request JSON" invisible="not request_json">
+                                <field name="request_json" readonly="1" widget="text"/>
+                            </page>
+                            <page string="Response JSON" invisible="not response_json">
+                                <field name="response_json" readonly="1" widget="text"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_eims_log_search" model="ir.ui.view">
+            <field name="name">eims.log.search</field>
+            <field name="model">eims.log</field>
+            <field name="arch" type="xml">
+                <search string="EIMS Logs">
+                    <field name="invoice_number"/>
+                    <field name="irn"/>
+                    <field name="move_id"/>
+                    <field name="company_id"/>
+                    <separator/>
+                    <filter string="Success" name="success" domain="[('state', '=', 'ok')]"/>
+                    <filter string="Failed" name="failed" domain="[('state', '=', 'failed')]"/>
+                    <filter string="Pending" name="pending" domain="[('state', '=', 'sent')]"/>
+                    <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <separator/>
+                    <filter string="Today" name="today" domain="[('datetime', '>=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"/>
+                    <filter string="This Week" name="this_week" domain="[('datetime', '>=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                    <filter string="This Month" name="this_month" domain="[('datetime', '>=', context_today().strftime('%Y-%m-01'))]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Invoice" name="invoice" domain="[]" context="{'group_by': 'move_id'}"/>
+                        <filter string="Company" name="company" domain="[]" context="{'group_by': 'company_id'}"/>
+                        <filter string="Status" name="status" domain="[]" context="{'group_by': 'state'}"/>
+                        <filter string="Date" name="date" domain="[]" context="{'group_by': 'datetime:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- EIMS Log Actions -->
+        <record id="action_eims_log" model="ir.actions.act_window">
+            <field name="name">EIMS Logs</field>
+            <field name="res_model">eims.log</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_eims_log_search"/>
+            <field name="context">{'search_default_today': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No EIMS logs yet!
+                </p>
+                <p>
+                    EIMS integration logs will appear here when invoices are processed.
+                    You can monitor the status of each integration attempt and retry failed ones.
+                </p>
+            </field>
+        </record>
+
+    </data>
+</odoo>
